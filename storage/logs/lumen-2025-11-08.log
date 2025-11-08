@@ -1,0 +1,106 @@
+[2025-11-08 02:28:17] local.ERROR: Class "Illuminate\Mail\MailServiceProvider" not found {"exception":"[object] (Error(code: 0): Class \"Illuminate\\Mail\\MailServiceProvider\" not found at C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Application.php:250)
+[stacktrace]
+#0 C:\\laragon\\www\\API_Club\\bootstrap\\app.php(56): Laravel\\Lumen\\Application->register('Illuminate\\\\Mail...')
+#1 C:\\laragon\\www\\API_Club\\public\\index.php(14): require('C:\\\\laragon\\\\www\\\\...')
+#2 {main}
+"} 
+[2025-11-08 02:29:07] local.ERROR: Class "Illuminate\Mail\MailServiceProvider" not found {"exception":"[object] (Error(code: 0): Class \"Illuminate\\Mail\\MailServiceProvider\" not found at C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Application.php:250)
+[stacktrace]
+#0 C:\\laragon\\www\\API_Club\\bootstrap\\app.php(32): Laravel\\Lumen\\Application->register('Illuminate\\\\Mail...')
+#1 C:\\laragon\\www\\API_Club\\public\\index.php(14): require('C:\\\\laragon\\\\www\\\\...')
+#2 {main}
+"} 
+[2025-11-08 02:29:54] local.ERROR: Class "Illuminate\Mail\MailServiceProvider" not found {"exception":"[object] (Error(code: 0): Class \"Illuminate\\Mail\\MailServiceProvider\" not found at C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Application.php:250)
+[stacktrace]
+#0 C:\\laragon\\www\\API_Club\\bootstrap\\app.php(32): Laravel\\Lumen\\Application->register('Illuminate\\\\Mail...')
+#1 C:\\laragon\\www\\API_Club\\public\\index.php(14): require('C:\\\\laragon\\\\www\\\\...')
+#2 {main}
+"} 
+[2025-11-08 02:29:56] local.ERROR: Class "Illuminate\Mail\MailServiceProvider" not found {"exception":"[object] (Error(code: 0): Class \"Illuminate\\Mail\\MailServiceProvider\" not found at C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Application.php:250)
+[stacktrace]
+#0 C:\\laragon\\www\\API_Club\\bootstrap\\app.php(32): Laravel\\Lumen\\Application->register('Illuminate\\\\Mail...')
+#1 C:\\laragon\\www\\API_Club\\public\\index.php(14): require('C:\\\\laragon\\\\www\\\\...')
+#2 {main}
+"} 
+[2025-11-08 02:29:57] local.ERROR: Class "Illuminate\Mail\MailServiceProvider" not found {"exception":"[object] (Error(code: 0): Class \"Illuminate\\Mail\\MailServiceProvider\" not found at C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Application.php:250)
+[stacktrace]
+#0 C:\\laragon\\www\\API_Club\\bootstrap\\app.php(32): Laravel\\Lumen\\Application->register('Illuminate\\\\Mail...')
+#1 C:\\laragon\\www\\API_Club\\public\\index.php(14): require('C:\\\\laragon\\\\www\\\\...')
+#2 {main}
+"} 
+[2025-11-08 02:29:57] local.ERROR: Class "Illuminate\Mail\MailServiceProvider" not found {"exception":"[object] (Error(code: 0): Class \"Illuminate\\Mail\\MailServiceProvider\" not found at C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Application.php:250)
+[stacktrace]
+#0 C:\\laragon\\www\\API_Club\\bootstrap\\app.php(32): Laravel\\Lumen\\Application->register('Illuminate\\\\Mail...')
+#1 C:\\laragon\\www\\API_Club\\public\\index.php(14): require('C:\\\\laragon\\\\www\\\\...')
+#2 {main}
+"} 
+[2025-11-08 02:29:58] local.ERROR: Class "Illuminate\Mail\MailServiceProvider" not found {"exception":"[object] (Error(code: 0): Class \"Illuminate\\Mail\\MailServiceProvider\" not found at C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Application.php:250)
+[stacktrace]
+#0 C:\\laragon\\www\\API_Club\\bootstrap\\app.php(32): Laravel\\Lumen\\Application->register('Illuminate\\\\Mail...')
+#1 C:\\laragon\\www\\API_Club\\public\\index.php(14): require('C:\\\\laragon\\\\www\\\\...')
+#2 {main}
+"} 
+[2025-11-08 02:29:58] local.ERROR: Class "Illuminate\Mail\MailServiceProvider" not found {"exception":"[object] (Error(code: 0): Class \"Illuminate\\Mail\\MailServiceProvider\" not found at C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Application.php:250)
+[stacktrace]
+#0 C:\\laragon\\www\\API_Club\\bootstrap\\app.php(32): Laravel\\Lumen\\Application->register('Illuminate\\\\Mail...')
+#1 C:\\laragon\\www\\API_Club\\public\\index.php(14): require('C:\\\\laragon\\\\www\\\\...')
+#2 {main}
+"} 
+[2025-11-08 02:30:16] local.ERROR: Class "Illuminate\Mail\MailServiceProvider" not found {"exception":"[object] (Error(code: 0): Class \"Illuminate\\Mail\\MailServiceProvider\" not found at C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Application.php:250)
+[stacktrace]
+#0 C:\\laragon\\www\\API_Club\\bootstrap\\app.php(32): Laravel\\Lumen\\Application->register('Illuminate\\\\Mail...')
+#1 C:\\laragon\\www\\API_Club\\public\\index.php(14): require('C:\\\\laragon\\\\www\\\\...')
+#2 {main}
+"} 
+[2025-11-08 02:30:19] local.ERROR: Class "Illuminate\Mail\MailServiceProvider" not found {"exception":"[object] (Error(code: 0): Class \"Illuminate\\Mail\\MailServiceProvider\" not found at C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Application.php:250)
+[stacktrace]
+#0 C:\\laragon\\www\\API_Club\\bootstrap\\app.php(32): Laravel\\Lumen\\Application->register('Illuminate\\\\Mail...')
+#1 C:\\laragon\\www\\API_Club\\public\\index.php(14): require('C:\\\\laragon\\\\www\\\\...')
+#2 {main}
+"} 
+[2025-11-08 02:30:30] local.ERROR: Class "Illuminate\Mail\MailServiceProvider" not found {"exception":"[object] (Error(code: 0): Class \"Illuminate\\Mail\\MailServiceProvider\" not found at C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Application.php:250)
+[stacktrace]
+#0 C:\\laragon\\www\\API_Club\\bootstrap\\app.php(32): Laravel\\Lumen\\Application->register('Illuminate\\\\Mail...')
+#1 C:\\laragon\\www\\API_Club\\public\\index.php(14): require('C:\\\\laragon\\\\www\\\\...')
+#2 {main}
+"} 
+[2025-11-08 02:34:45] local.ERROR: Failed to authenticate on SMTP server with username "your_email@gmail.com" using the following authenticators: "LOGIN", "PLAIN", "XOAUTH2". Authenticator "LOGIN" returned "Expected response code "235" but got code "535", with message "535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials d2e1a72fcca58-7b0c953cf79sm4397770b3a.3 - gsmtp".". Authenticator "PLAIN" returned "Expected response code "235" but got code "535", with message "535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials d2e1a72fcca58-7b0c953cf79sm4397770b3a.3 - gsmtp".". Authenticator "XOAUTH2" returned "Expected response code "235" but got code "334", with message "334 eyJzdGF0dXMiOiI0MDAiLCJzY2hlbWVzIjoiQmVhcmVyIiwic2NvcGUiOiJodHRwczovL21haWwuZ29vZ2xlLmNvbS8ifQ==".". {"exception":"[object] (Symfony\\Component\\Mailer\\Exception\\TransportException(code: 334): Failed to authenticate on SMTP server with username \"your_email@gmail.com\" using the following authenticators: \"LOGIN\", \"PLAIN\", \"XOAUTH2\". Authenticator \"LOGIN\" returned \"Expected response code \"235\" but got code \"535\", with message \"535-5.7.8 Username and Password not accepted. For more information, go to
+
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials d2e1a72fcca58-7b0c953cf79sm4397770b3a.3 - gsmtp\".\". Authenticator \"PLAIN\" returned \"Expected response code \"235\" but got code \"535\", with message \"535-5.7.8 Username and Password not accepted. For more information, go to
+
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials d2e1a72fcca58-7b0c953cf79sm4397770b3a.3 - gsmtp\".\". Authenticator \"XOAUTH2\" returned \"Expected response code \"235\" but got code \"334\", with message \"334 eyJzdGF0dXMiOiI0MDAiLCJzY2hlbWVzIjoiQmVhcmVyIiwic2NvcGUiOiJodHRwczovL21haWwuZ29vZ2xlLmNvbS8ifQ==\".\". at C:\\laragon\\www\\API_Club\\vendor\\symfony\\mailer\\Transport\\Smtp\\EsmtpTransport.php:226)
+[stacktrace]
+#0 C:\\laragon\\www\\API_Club\\vendor\\symfony\\mailer\\Transport\\Smtp\\EsmtpTransport.php(161): Symfony\\Component\\Mailer\\Transport\\Smtp\\EsmtpTransport->handleAuth(Array)
+#1 C:\\laragon\\www\\API_Club\\vendor\\symfony\\mailer\\Transport\\Smtp\\EsmtpTransport.php(118): Symfony\\Component\\Mailer\\Transport\\Smtp\\EsmtpTransport->doEhloCommand()
+#2 C:\\laragon\\www\\API_Club\\vendor\\symfony\\mailer\\Transport\\Smtp\\SmtpTransport.php(243): Symfony\\Component\\Mailer\\Transport\\Smtp\\EsmtpTransport->executeCommand('HELO [127.0.0.1...', Array)
+#3 C:\\laragon\\www\\API_Club\\vendor\\symfony\\mailer\\Transport\\Smtp\\SmtpTransport.php(266): Symfony\\Component\\Mailer\\Transport\\Smtp\\SmtpTransport->doHeloCommand()
+#4 C:\\laragon\\www\\API_Club\\vendor\\symfony\\mailer\\Transport\\Smtp\\SmtpTransport.php(199): Symfony\\Component\\Mailer\\Transport\\Smtp\\SmtpTransport->start()
+#5 C:\\laragon\\www\\API_Club\\vendor\\symfony\\mailer\\Transport\\AbstractTransport.php(69): Symfony\\Component\\Mailer\\Transport\\Smtp\\SmtpTransport->doSend(Object(Symfony\\Component\\Mailer\\SentMessage))
+#6 C:\\laragon\\www\\API_Club\\vendor\\symfony\\mailer\\Transport\\Smtp\\SmtpTransport.php(137): Symfony\\Component\\Mailer\\Transport\\AbstractTransport->send(Object(Symfony\\Component\\Mime\\Email), Object(Symfony\\Component\\Mailer\\DelayedEnvelope))
+#7 C:\\laragon\\www\\API_Club\\vendor\\illuminate\\mail\\Mailer.php(573): Symfony\\Component\\Mailer\\Transport\\Smtp\\SmtpTransport->send(Object(Symfony\\Component\\Mime\\Email), Object(Symfony\\Component\\Mailer\\DelayedEnvelope))
+#8 C:\\laragon\\www\\API_Club\\vendor\\illuminate\\mail\\Mailer.php(335): Illuminate\\Mail\\Mailer->sendSymfonyMessage(Object(Symfony\\Component\\Mime\\Email))
+#9 C:\\laragon\\www\\API_Club\\vendor\\illuminate\\mail\\Mailer.php(224): Illuminate\\Mail\\Mailer->send(NULL, Array, Object(Closure))
+#10 C:\\laragon\\www\\API_Club\\vendor\\illuminate\\mail\\MailManager.php(592): Illuminate\\Mail\\Mailer->raw('Th\\xE1\\xBB\\xAD g\\xE1\\xBB\\xADi mai...', Object(Closure))
+#11 C:\\laragon\\www\\API_Club\\vendor\\illuminate\\support\\Facades\\Facade.php(355): Illuminate\\Mail\\MailManager->__call('raw', Array)
+#12 C:\\laragon\\www\\API_Club\\routes\\web.php(103): Illuminate\\Support\\Facades\\Facade::__callStatic('raw', Array)
+#13 C:\\laragon\\www\\API_Club\\vendor\\illuminate\\container\\BoundMethod.php(36): Closure->{closure}()
+#14 C:\\laragon\\www\\API_Club\\vendor\\illuminate\\container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#15 C:\\laragon\\www\\API_Club\\vendor\\illuminate\\container\\BoundMethod.php(81): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#16 C:\\laragon\\www\\API_Club\\vendor\\illuminate\\container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Laravel\\Lumen\\Application), Object(Closure), Object(Closure))
+#17 C:\\laragon\\www\\API_Club\\vendor\\illuminate\\container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Laravel\\Lumen\\Application), Object(Closure), Array, NULL)
+#18 C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Concerns\\RoutesRequests.php(304): Illuminate\\Container\\Container->call(Object(Closure), Array)
+#19 C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Concerns\\RoutesRequests.php(269): Laravel\\Lumen\\Application->callActionOnArrayBasedRoute(Array)
+#20 C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Concerns\\RoutesRequests.php(171): Laravel\\Lumen\\Application->handleFoundRoute(Array)
+#21 C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Routing\\Pipeline.php(48): Laravel\\Lumen\\Application->Laravel\\Lumen\\Concerns\\{closure}(Object(Laravel\\Lumen\\Http\\Request))
+#22 C:\\laragon\\www\\API_Club\\app\\Http\\Middleware\\CorsMiddleware.php(19): Laravel\\Lumen\\Routing\\Pipeline->Laravel\\Lumen\\Routing\\{closure}(Object(Laravel\\Lumen\\Http\\Request))
+#23 C:\\laragon\\www\\API_Club\\vendor\\illuminate\\pipeline\\Pipeline.php(183): App\\Http\\Middleware\\CorsMiddleware->handle(Object(Laravel\\Lumen\\Http\\Request), Object(Closure))
+#24 C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Routing\\Pipeline.php(30): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Laravel\\Lumen\\Http\\Request))
+#25 C:\\laragon\\www\\API_Club\\vendor\\illuminate\\pipeline\\Pipeline.php(119): Laravel\\Lumen\\Routing\\Pipeline->Laravel\\Lumen\\Routing\\{closure}(Object(Laravel\\Lumen\\Http\\Request))
+#26 C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Concerns\\RoutesRequests.php(428): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#27 C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Concerns\\RoutesRequests.php(167): Laravel\\Lumen\\Application->sendThroughPipeline(Array, Object(Closure))
+#28 C:\\laragon\\www\\API_Club\\vendor\\laravel\\lumen-framework\\src\\Concerns\\RoutesRequests.php(112): Laravel\\Lumen\\Application->dispatch(NULL)
+#29 C:\\laragon\\www\\API_Club\\public\\index.php(28): Laravel\\Lumen\\Application->run()
+#30 {main}
+"} 
