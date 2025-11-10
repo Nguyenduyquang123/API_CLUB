@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use App\Models\PostComment;
 use Illuminate\Http\Request;
-
+use App\Events\CommentCreated;
+use Pusher\Pusher;
 class CommentController extends Controller
 {
     // Lấy tất cả comment theo post_id
@@ -31,7 +32,7 @@ class CommentController extends Controller
             'user_id' => $request->user_id,
             'content' => $request->content,
         ]);
-
+        (new CommentCreated($comment))->broadcast();
         return response()->json($comment->load('user'), 201);
     }
 }

@@ -125,6 +125,30 @@ class UserController extends Controller
 
         return response()->json(['avatar' => $avatarUrl]);
             }
+public function find(Request $request)
+{
+    $keyword = $request->query('keyword');
 
+    if (!$keyword) {
+        return response()->json(['message' => 'Thiếu tham số tìm kiếm'], 400);
+    }
+
+    $user = DB::table('users')
+        ->where('email', $keyword)
+        ->orWhere('username', $keyword)
+        ->first();
+
+    if (!$user) {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+
+    return response()->json([
+        'id' => $user->id,
+        'username' => $user->username,
+        'email' => $user->email,
+        'displayName' => $user->displayName,
+        'avatarUrl' => $user->avatarUrl,
+    ]);
+}
 
 }
