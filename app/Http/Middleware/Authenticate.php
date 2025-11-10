@@ -3,8 +3,9 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Contracts\Auth\Factory as Auth;
-
+use Exception;
 class Authenticate
 {
     /**
@@ -35,10 +36,11 @@ class Authenticate
      */
    public function handle($request, Closure $next, $guard = null)
     {
-        if ($this->auth->guard($guard)->guest()) {
+       try {
+            $user = JWTAuth::parseToken()->authenticate();
+        } catch (Exception $e) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
-
         return $next($request);
     }
 }

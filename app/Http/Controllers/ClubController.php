@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ClubInviteMail;
 use App\Models\Club;
 use App\Models\ClubMember;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class ClubController extends Controller
 {
@@ -154,4 +157,75 @@ class ClubController extends Controller
             'club' => $club
         ]);
     }
+     public function acceptInvite(Request $request)
+    {
+        $request->validate([
+            'invite_code' => 'required|string',
+            'user_id' => 'required|integer'
+        ]);
+
+        $club = Club::where('invite_code', $request->invite_code)->firstOrFail();
+
+        // Kiểm tra user đã là thành viên chưa
+        $exists = ClubMember::where('club_id', $club->id)
+                            ->where('user_id', $request->user_id)
+                            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn đã là thành viên.'
+            ]);
+        }
+
+        // Thêm vào bảng club_members
+        ClubMember::create([
+            'club_id' => $club->id,
+            'user_id' => $request->user_id,
+         
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Bạn đã gia nhập câu lạc bộ!'
+        ]);
+    }
+    public function sendInvite(Request $request)
+{
+    $clubId = $request->route('club'); // Lấy param từ URL
+
+    // Validate thủ công
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    $club = Club::find($clubId);
+    if (!$club) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Club không tồn tại'
+        ], 404);
+    }
+
+    try {
+        Mail::to($request->email)->send(new ClubInviteMail($club));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Email mời đã được gửi!'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
 }

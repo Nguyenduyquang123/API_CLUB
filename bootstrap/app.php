@@ -27,7 +27,10 @@ $app->withFacades();
 
 $app->withEloquent();
 
+$app->configure('mail');
 
+$app->register(Illuminate\Mail\MailServiceProvider::class);
+class_alias(Illuminate\Support\Facades\Mail::class, 'Mail');
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
