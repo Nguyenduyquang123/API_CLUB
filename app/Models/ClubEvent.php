@@ -15,9 +15,9 @@ class ClubEvent extends Model
         'start_time',
         'end_time',
         'location',
-        'type',
-        'is_paid',
         'max_participants',
+        'notify',
+        'require_registration',
         'status',
     ];
 
@@ -37,4 +37,18 @@ class ClubEvent extends Model
                     ->withPivot('role', 'status', 'joined_at')
                     ->withTimestamps();
     }
+
+        public function participants()
+    {
+        return $this->belongsToMany(User::class, 'event_participants')
+                    ->withPivot('role')
+                    ->withTimestamps();
+    }
+    public function joinedEvents()
+    {
+        return $this->belongsToMany(ClubEvent::class, 'event_participants')
+                    ->withPivot('role')
+                    ->withTimestamps();
+    }
+
 }

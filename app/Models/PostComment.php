@@ -27,5 +27,9 @@ class PostComment extends Model implements AuthenticatableContract, Authorizable
     public function post() {
         return $this->belongsTo(Post::class);
     }
+    public function likes() {
+        return $this->hasMany(CommentLike::class, 'comment_id');
+    }
+
 
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
+use App\Models\Post;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -54,35 +56,45 @@ class UserController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        // Nếu có gửi mật khẩu cũ → kiểm tra
-        if ($request->filled('oldPassword')) {
+        // 🟢 1. Nếu có mật khẩu cũ + mật khẩu mới => đổi mật khẩu
+        if ($request->filled('oldPassword') && $request->filled('password')) {
             if (!Hash::check($request->oldPassword, $user->hashedPassword)) {
                 return response()->json(['message' => 'Mật khẩu cũ không đúng'], 400);
             }
-        }
-        if ($request->filled('password')) {
-            $data['hashedPassword'] = Hash::make($request->password);
-            DB::table('users')->where('id', $id)->update($data);
-            
+
+            DB::table('users')->where('id', $id)->update([
+                'hashedPassword' => Hash::make($request->password),
+                'updated_at' => Carbon::now(),
+            ]);
+
+            return response()->json(['message' => 'Đổi mật khẩu thành công'], 200);
         }
 
-        // Tạo mảng dữ liệu cần update
-        $data = [
-            'displayName' => $request->displayName,
-            'bio' => $request->bio,
-            'phone' => $request->phone,
-            'updated_at' => Carbon::now(),
-        ];
+        // 🟢 2. Nếu chỉ muốn cập nhật thông tin cá nhân
+        $data = [];
+        if ($request->filled('displayName')) {
+            $data['displayName'] = $request->displayName;
+        }
+        if ($request->filled('bio')) {
+            $data['bio'] = $request->bio;
+        }
+        if ($request->filled('phone')) {
+            $data['phone'] = $request->phone;
+        }
 
-        // ⚡ Chỉ cập nhật hashedPassword nếu có gửi password mới
-      
+        // Nếu không có gì để cập nhật
+        if (empty($data)) {
+            return response()->json(['message' => 'Không có dữ liệu để cập nhật'], 400);
+        }
+
+        $data['updated_at'] = Carbon::now();
 
         DB::table('users')->where('id', $id)->update($data);
 
         $updatedUser = DB::table('users')->where('id', $id)->first();
 
         return response()->json([
-            'message' => 'User updated successfully',
+            'message' => 'Cập nhật thông tin thành công',
             'user' => $updatedUser,
         ], 200);
     }
@@ -125,30 +137,75 @@ class UserController extends Controller
 
         return response()->json(['avatar' => $avatarUrl]);
             }
-public function find(Request $request)
+    public function find(Request $request)
+    {
+        $keyword = $request->query('keyword');
+
+        if (!$keyword) {
+            return response()->json(['message' => 'Thiếu tham số tìm kiếm'], 400);
+        }
+
+        $user = DB::table('users')
+            ->where('email', $keyword)
+            ->orWhere('username', $keyword)
+            ->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        return response()->json([
+            'id' => $user->id,
+            'username' => $user->username,
+            'email' => $user->email,
+            'displayName' => $user->displayName,
+            'avatarUrl' => $user->avatarUrl,
+        ]);
+    }
+    public function getUserStats($userId)
+    {
+        // 🔹 Đếm tổng số bài viết do user tạo
+        $postsCount = DB::table('posts')
+            ->where('user_id', $userId)
+            ->count();
+
+        // 🔹 Đếm tổng số bình luận trên các bài viết của user
+        $commentsCount = DB::table('post_comments')
+            ->join('posts', 'post_comments.post_id', '=', 'posts.id')
+            ->where('posts.user_id', $userId)
+            ->count();
+
+        // 🔹 Đếm tổng số lượt like trên các bài viết của user
+        $likesCount = DB::table('post_likes')
+            ->join('posts', 'post_likes.post_id', '=', 'posts.id')
+            ->where('posts.user_id', $userId)
+            ->count();
+
+        return response()->json([
+            'posts' => $postsCount,
+            'comments' => $commentsCount,
+            'likes' => $likesCount
+        ]);
+    }
+    public function getUserPosts($userId)
+    {
+        $posts = Post::with('creator')
+            ->withCount('likes')       // số lượt thích bài viết
+            ->with(['comments.user', 'comments.likes']) // comment + user + like
+            ->where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($posts);
+    }
+    public function getUserNotifications($userId)
 {
-    $keyword = $request->query('keyword');
-
-    if (!$keyword) {
-        return response()->json(['message' => 'Thiếu tham số tìm kiếm'], 400);
-    }
-
-    $user = DB::table('users')
-        ->where('email', $keyword)
-        ->orWhere('username', $keyword)
-        ->first();
-
-    if (!$user) {
-        return response()->json(['message' => 'User not found'], 404);
-    }
-
-    return response()->json([
-        'id' => $user->id,
-        'username' => $user->username,
-        'email' => $user->email,
-        'displayName' => $user->displayName,
-        'avatarUrl' => $user->avatarUrl,
-    ]);
+   $notifications = Notification::with(['fromUser', 'club'])
+    ->where('user_id', $userId)
+    ->orderBy('created_at', 'desc')
+    ->get();
+    return response()->json($notifications);
 }
+
 
 }

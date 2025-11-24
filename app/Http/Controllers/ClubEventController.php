@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\ClubEvent;
 use App\Models\ClubEventMember;
+use App\Models\ClubMember;
+use App\Models\EventParticipant;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
@@ -39,6 +42,7 @@ class ClubEventController extends Controller
 
         $event->member_count = $event->members->count();
 
+        
         return response()->json($event);
     }
 
@@ -56,9 +60,9 @@ class ClubEventController extends Controller
             'start_time' => 'required|date',
             'end_time' => 'required|date|after_or_equal:start_time',
             'location' => 'nullable|string|max:255',
-            'type' => 'in:public,private',
-            'is_paid' => 'boolean',
             'max_participants' => 'nullable|integer|min:1',
+            'notify' => 'boolean',
+            'require_registration' => 'boolean',
         ]);
 
         if ($validator->fails()) {
@@ -95,11 +99,34 @@ class ClubEventController extends Controller
             'start_time' => Carbon::parse($request->start_time),
             'end_time' => Carbon::parse($request->end_time),
             'location' => $request->location,
-            'type' => $request->type ?? 'public',
-            'is_paid' => $request->is_paid ?? false,
             'max_participants' => $request->max_participants,
+            'notify' => $request->notify ?? false,
+            'require_registration' => $request->require_registration ?? false,
             'status' => 'upcoming',
         ]);
+        if ($event->notify) {
+        // Lấy tất cả thành viên CLB trừ người tạo event
+        $members = ClubMember::where('club_id', $event->club_id)
+                            ->where('user_id', '!=', $event->created_by)
+                            ->get();
+
+        foreach ($members as $member) {
+            $noti = Notification::create([
+                'user_id' => $member->user_id,
+                'type' => 'club_event',
+                'club_id' => $event->club_id,       // thêm dòng này
+                'title' => 'Sự kiện sắp tới: ' . $event->title,
+                'message' => $event->description,
+                'related_post_id' => null,
+                'related_comment_id' => null,
+                'is_read' => false,
+            ]);
+
+            // 🔥 Gửi realtime
+            (new \App\Events\NewNotification($noti))->broadcast();
+    }
+}
+
 
         return response()->json([
             'message' => 'Event created successfully',
@@ -145,14 +172,36 @@ class ClubEventController extends Controller
     /**
      * Xoá sự kiện
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
+        $authUserId = $request->input('auth_user_id');
+
+        if (!$authUserId) {
+            return response()->json(['error' => 'Missing auth_user_id'], 400);
+        }
+
+        // Lấy event
         $event = ClubEvent::find($id);
 
         if (!$event) {
             return response()->json(['message' => 'Event not found'], 404);
         }
 
+        // Lấy role của user trong CLB
+        $role = ClubMember::where('club_id', $event->club_id)
+            ->where('user_id', $authUserId)
+            ->value('role');
+
+        if (!$role) {
+            return response()->json(['error' => 'Bạn không thuộc CLB này'], 403);
+        }
+
+        // Chỉ owner + admin mới được xóa
+        if (!in_array($role, ['owner', 'admin'])) {
+            return response()->json(['error' => 'Bạn không có quyền xóa sự kiện'], 403);
+        }
+
+        // Xóa sự kiện
         $event->delete();
 
         return response()->json(['message' => 'Event deleted successfully']);
@@ -219,14 +268,101 @@ class ClubEventController extends Controller
 
         return response()->json(['message' => 'Left event successfully']);
     }
-    public function getByClub($clubId)
+    public function getByClub(Request $request, $clubId)
     {
+        // Lấy danh sách sự kiện
         $events = ClubEvent::with(['creator', 'club'])
             ->where('club_id', $clubId)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return response()->json($events);
+        // Lấy user_id FE gửi lên
+        $userId = $request->query('user_id');
+
+        // Lấy role trong CLB
+        $userRoleInClub = null;
+
+        if ($userId) {
+            $member = ClubMember::where('club_id', $clubId)
+                ->where('user_id', $userId)
+                ->first();
+
+            $userRoleInClub = $member ? $member->role : null;
+        }
+
+        return response()->json([
+            'events' => $events,
+            'user_role_in_club' => $userRoleInClub
+        ]);
+    }
+    public function addParticipant(Request $request, $eventId)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'role' => 'nullable|string|max:255',
+        ]);
+
+        $event = ClubEvent::findOrFail($eventId);
+
+        // Thêm người tham gia (sẽ không thêm trùng do có unique key)
+        $event->participants()->syncWithoutDetaching([
+            $request->user_id => ['role' => $request->role],
+        ]);
+
+        return response()->json(['message' => 'Thêm người tham gia thành công']);
+    }
+   // Lấy danh sách người tham gia
+
+    public function getParticipants($eventId)
+    {
+        $participants = EventParticipant::with('user')
+            ->where('event_id', $eventId)
+            ->get();
+
+        return response()->json($participants);
+    }
+
+    // Toggle tham gia/hủy
+      // Toggle tham gia/hủy sự kiện
+    public function toggleJoin($eventId, Request $request)
+    {
+        $userId = $request->input('user_id');
+
+        if (!$userId) {
+            return response()->json(['error' => 'user_id is required'], 400);
+        }
+
+        $participant = EventParticipant::where('event_id', $eventId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if ($participant) {
+            // Hủy tham gia
+            $participant->delete();
+            return response()->json(['joined' => false]);
+        } else {
+            // Lấy event -> club_id trước
+            $event = ClubEvent::find($eventId);
+            if (!$event) {
+                return response()->json(['error' => 'Event not found'], 404);
+            }
+
+            // Lấy role từ club_members
+            $clubMember = ClubMember::where('club_id', $event->club_id)
+                ->where('user_id', $userId)
+                ->first();
+
+            $role = $clubMember ? $clubMember->role : 'Thành viên';
+
+            // Tham gia
+            EventParticipant::create([
+                'event_id' => $eventId,
+                'user_id' => $userId,
+                'role' => $role,
+            ]);
+
+            return response()->json(['joined' => true]);
+        }
     }
 
 }

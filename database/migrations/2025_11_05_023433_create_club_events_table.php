@@ -19,10 +19,10 @@ return new class extends Migration {
             $table->dateTime('end_time');
             $table->string('location')->nullable();
 
-            $table->enum('type', ['public', 'private'])->default('public');
-            $table->boolean('is_paid')->default(false);
+           
             $table->integer('max_participants')->nullable();
-
+         $table->boolean('notify')->default(false); 
+            $table->boolean('require_registration')->default(false);
             $table->enum('status', ['upcoming', 'ongoing', 'ended', 'cancelled'])->default('upcoming');
 
             $table->timestamps();

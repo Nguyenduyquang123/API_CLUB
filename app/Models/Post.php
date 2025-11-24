@@ -29,9 +29,8 @@ class Post extends Model
         return $this->hasMany(PostComment::class, 'post_id');
     }
 
-    // // 🔹 Danh sách lượt thích
-    // public function likes()
-    // {
-    //     return $this->hasMany(Like::class, 'post_id');
-    // }
+    public function likes()
+    {
+        return $this->hasMany(PostLike::class, 'post_id');
+    }
 }
