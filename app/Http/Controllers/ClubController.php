@@ -227,5 +227,36 @@ class ClubController extends Controller
             'message' => $e->getMessage()
         ], 500);
     }
+    }
+
+public function deleteClub(Request $request, $clubId)
+{
+    $userId = $request->input('user_id');
+
+    // Check club tồn tại
+    $club = Club::find($clubId);
+    if (!$club) {
+        return response()->json(['message' => 'Club không tồn tại'], 404);
+    }
+
+    // Lấy role từ bảng club_members
+    $member = ClubMember::where('club_id', $clubId)
+                        ->where('user_id', $userId)
+                        ->first();
+
+    if (!$member) {
+        return response()->json(['message' => 'Bạn không phải thành viên của club'], 403);
+    }
+
+    // Chỉ owner mới được xóa
+    if ($member->role !== 'owner') {
+        return response()->json(['message' => 'Bạn không có quyền xóa club'], 403);
+    }
+
+    // Xóa club
+    $club->delete();
+
+    return response()->json(['message' => 'Xóa club thành công']);
 }
+
 }

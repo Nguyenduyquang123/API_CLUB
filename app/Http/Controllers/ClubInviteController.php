@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 class ClubInviteController extends Controller
 {
+    
     // 1. Gửi lời mời
     public function sendInvite(Request $request, $clubId)
     {
@@ -21,6 +22,16 @@ class ClubInviteController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
+        $inviteeId = $request->invitee_id;
+        
+           $isMember = DB::table('club_members')
+        ->where('club_id', $clubId)
+        ->where('user_id', $inviteeId)
+        ->exists();
+
+    if ($isMember) {
+        return response()->json(['message' => 'Người này đã là thành viên của câu lạc bộ!'], 400);
+    }
 
         // Kiểm tra lời mời đã tồn tại chưa
         $existing = ClubInvite::where('club_id', $clubId)
@@ -98,5 +109,31 @@ class ClubInviteController extends Controller
         $invite->save();
 
         return response()->json(['message' => 'Đã từ chối lời mời.']);
+    }
+    
+    // 5️⃣ ✅ Lấy danh sách lời mời theo Club ID (cho admin xem)
+    public function getInvitesByClub($clubId)
+    {
+        $invites = ClubInvite::where('club_id', $clubId)
+            ->with(['invitee:id,email', 'inviter:id,email'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($invites);
+    }
+
+    public function cancelInvite($inviteId)
+    {
+        $invite = ClubInvite::findOrFail($inviteId);
+
+        // Nếu lời mời đã được xử lý (chấp nhận hoặc từ chối) thì không được hủy
+        if ($invite->status !== 'pending') {
+            return response()->json(['message' => 'Lời mời này đã được xử lý, không thể hủy!'], 400);
+        }
+
+        // Xóa bản ghi khỏi DB
+        $invite->delete();
+
+        return response()->json(['message' => 'Đã hủy và xóa lời mời thành công.']);
     }
 }

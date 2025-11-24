@@ -18,11 +18,22 @@ class PostLike extends Model implements AuthenticatableContract, AuthorizableCon
      *
      * @var string[]
      */
-    protected $fillable = ['post_id','user_id'];
+      protected $table = 'post_likes';
+    protected $fillable = ['post_id', 'user_id'];
 
     /**
      * The attributes excluded from the model's JSON form.
      *
      * @var string[]
      */
+     // 🔗 Mối quan hệ
+    public function post()
+    {
+        return $this->belongsTo(Post::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
