@@ -16,4 +16,5 @@ return [
         'address' => env('MAIL_FROM_ADDRESS', 'clubmail@gmail.com'),
         'name' => env('MAIL_FROM_NAME', 'Club Mail'),
     ],
+    
 ];

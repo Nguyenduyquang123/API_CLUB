@@ -16,8 +16,9 @@ return new class extends Migration
             $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('role')->nullable(); // ví dụ: Chủ nhiệm, Thành viên...
+            $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');
             $table->timestamps();
-
+            
             $table->unique(['event_id', 'user_id']); // tránh trùng người tham gia
         });
     }

@@ -17,28 +17,28 @@ class ClubController extends Controller
         return response()->json(Club::all());
     }
 
-  public function show(Request $request, $id)
+    public function show($id)
     {
-        $club = Club::find($id);
+        $club = Club::withCount('members')->find($id);
+
         if (!$club) {
-            return response()->json(['message' => 'Club not found'], 404);
+            return response()->json(['message' => 'CLB không tồn tại'], 404);
         }
 
-        // 🔐 Lấy user từ middleware (hoặc request)
-        $user = $request->user;
-        if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
+        // Club riêng tư
+      
+            if (!auth()->check()) {
+                return response()->json(['message' => 'Bạn không có quyền truy cập'], 403);
+            }
 
-        // 🔒 Kiểm tra thành viên
-        $isMember = ClubMember::where('club_id', $id)
-            ->where('user_id', $user->id)
-            ->exists();
+            $isMember = $club->members()
+                ->where('user_id', auth()->id())
+                ->exists();
 
-        // Nếu không phải thành viên & CLB không công khai → từ chối
-        if (!$isMember && $club->is_public == 0) {
-            return response()->json(['message' => 'Bạn không có quyền truy cập CLB này'], 403);
-        }
+            if (!$isMember) {
+                return response()->json(['message' => 'CLB riêng tư'], 403);
+            }
+        
 
         return response()->json($club);
     }
@@ -89,16 +89,33 @@ class ClubController extends Controller
     }
 
     // Cập nhật CLB
-    public function update(Request $request, $id)
-    {
-        $club = Club::find($id);
-        if (!$club) {
-            return response()->json(['message' => 'Club not found'], 404);
-        }
+  public function update(Request $request, $clubId)
+{
+    $club = Club::find($clubId);
 
-        $club->update($request->all());
-        return response()->json($club);
+    if (!$club) {
+        return response()->json(['message' => 'Club not found'], 404);
     }
+
+    // Update name & description
+    $club->name = $request->input('name');
+    $club->description = $request->input('description');
+
+    // Nếu có file avatar
+    if ($request->hasFile('avatar')) {
+        $path = $request->file('avatar')->store('avatars', 'public');
+        $club->avatar_url = 'storage/'.$path;
+    }
+
+    $club->save();
+
+    return response()->json([
+        'message' => 'Updated successfully',
+        'club' => $club
+    ]);
+}
+
+
 
     // Xóa CLB
     public function destroy($id)
@@ -229,34 +246,84 @@ class ClubController extends Controller
     }
     }
 
-public function deleteClub(Request $request, $clubId)
-{
-    $userId = $request->input('user_id');
+    public function deleteClub(Request $request, $clubId)
+    {
+        $userId = $request->input('user_id');
 
-    // Check club tồn tại
-    $club = Club::find($clubId);
-    if (!$club) {
-        return response()->json(['message' => 'Club không tồn tại'], 404);
+        // Check club tồn tại
+        $club = Club::find($clubId);
+        if (!$club) {
+            return response()->json(['message' => 'Club không tồn tại'], 404);
+        }
+
+        // Lấy role từ bảng club_members
+        $member = ClubMember::where('club_id', $clubId)
+                            ->where('user_id', $userId)
+                            ->first();
+
+        if (!$member) {
+            return response()->json(['message' => 'Bạn không phải thành viên của club'], 403);
+        }
+
+        // Chỉ owner mới được xóa
+        if ($member->role !== 'owner') {
+            return response()->json(['message' => 'Bạn không có quyền xóa club'], 403);
+        }
+
+        // Xóa club
+        $club->delete();
+
+        return response()->json(['message' => 'Xóa club thành công']);
     }
 
-    // Lấy role từ bảng club_members
-    $member = ClubMember::where('club_id', $clubId)
-                        ->where('user_id', $userId)
-                        ->first();
+      public function showSettings(Request $request, $id)
+    {
+        $club = Club::find($id);
+        if (!$club) {
+            return response()->json(['message' => 'Club not found'], 404);
+        }
 
-    if (!$member) {
-        return response()->json(['message' => 'Bạn không phải thành viên của club'], 403);
+        // 🔐 Lấy user từ middleware (hoặc request)
+        $user = $request->user;
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        // 🔒 Kiểm tra thành viên
+        $isMember = ClubMember::where('club_id', $id)
+            ->where('user_id', $user->id)
+            ->exists();
+
+        // kiếm tra role có phsải owner và admin không
+        $member = ClubMember::where('club_id', $id)
+            ->where('user_id', $user->id)
+            ->first();
+        if (!$isMember || !in_array($member->role, ['owner', 'admin'])) {
+            return response()->json(['message' => 'Bạn không có quyền truy cập cài đặt CLB này'], 403);
+        }
+
+        return response()->json($club);
+    }
+    public function publicClubs()
+    {
+        $clubs = Club::where('is_public', 1)->get();
+        return response()->json($clubs);
+    }
+    public function updatePrivacy($id, Request $request)
+    {
+        $this->validate($request, [
+            'privacy' => 'required|in:0,1',
+        ]);
+
+        $club = Club::findOrFail($id);
+        $club->is_public = (int) $request->privacy;
+        $club->save();
+
+        return response()->json([
+            'message' => 'Cập nhật quyền riêng tư thành công',
+            'privacy' => $club->is_public
+        ]);
     }
 
-    // Chỉ owner mới được xóa
-    if ($member->role !== 'owner') {
-        return response()->json(['message' => 'Bạn không có quyền xóa club'], 403);
-    }
-
-    // Xóa club
-    $club->delete();
-
-    return response()->json(['message' => 'Xóa club thành công']);
-}
 
 }

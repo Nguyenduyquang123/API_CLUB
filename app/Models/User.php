@@ -39,4 +39,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->hasMany(Club::class, 'owner_id');
     }
+    public function clubMembers()
+{
+    return $this->hasMany(ClubMember::class, 'user_id', 'id');
+}
 }

@@ -9,41 +9,30 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    // Đăng ký
+   
 public function register(Request $request)
 {
-    // 1. Cập nhật Quy tắc Xác thực (Validation Rules)
+   
     $this->validate($request, [
         'username' => 'required|string|max:255|unique:users',
         'email' => 'required|email|max:255|unique:users',
-        // Thêm trường nickname, ví dụ: không bắt buộc, tối đa 255 ký tự
         'displayName' => 'nullable|string|max:255', 
-        
-        // Mật khẩu phải khớp với trường 'password_confirmation'
-        // Tôi đã đổi tên 'hashedPassword' thành 'password' cho chuẩn Laravel
         'password' => 'required|string|min:6|confirmed', 
-        'password_confirmation' => 'required|string|min:6', // Trường nhập lại mật khẩu
+        'password_confirmation' => 'required|string|min:6', 
     ]);
 
-    // 2. Tạo Người dùng (User Creation)
+
     $user = User::create([
         'username' => $request->username,
         'email' => $request->email,
-        
-        // Sử dụng $request->password vì trường gửi lên giờ tên là 'password'
-        // Laravel khuyến nghị dùng Hash::make() thay vì password_hash()
         'hashedPassword' => \Illuminate\Support\Facades\Hash::make($request->password), 
-        
-        // Thêm trường nickname (lưu ý: đảm bảo cột này có trong database)
         'displayName' => $request->displayName ?? $request->username,
 
     ]);
 
-    // Trả về response JSON
     return response()->json(['message' => 'Đăng ký thành công', 'user' => $user]);
 }
 
-    // Đăng nhập
     public function login(Request $request)
     {
         $user = User::where('email', $request->email)->first();
@@ -53,7 +42,6 @@ public function register(Request $request)
         }
 
         $token = Str::random(60);
-        // Lưu token vào bảng users
         $user->api_token = $token;
         $user->save();
 
@@ -66,13 +54,11 @@ public function register(Request $request)
         ]);
     }
 
-    // Lấy thông tin người dùng
     public function profile(Request $request)
     {
         return response()->json(['user' => $request->user]);
     }
 
-    // Đăng xuất
     public function logout(Request $request)
     {
         $user = $request->user;
@@ -86,8 +72,6 @@ public function register(Request $request)
             if (!$user) {
                 return response()->json(['message' => 'Token không hợp lệ'], 401);
             }
-
-            // Xóa token khỏi bảng users
             $user->api_token = null;
             $user->save();
 

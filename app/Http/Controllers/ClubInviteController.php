@@ -8,6 +8,18 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 class ClubInviteController extends Controller
 {
+  public function show($inviteId)
+{
+    // Lấy thông tin invite kèm thông tin club và người mời
+  $invite = ClubInvite::with('club', 'inviter', 'invitee')->find($inviteId);
+
+    if (!$invite) {
+        return response()->json(['message' => 'Invite not found'], 404);
+    }
+
+    return response()->json($invite);
+}
+
     
     // 1. Gửi lời mời
     public function sendInvite(Request $request, $clubId)

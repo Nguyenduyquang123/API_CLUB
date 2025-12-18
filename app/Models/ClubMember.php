@@ -11,7 +11,9 @@ class ClubMember extends Model
         'role',
         'joined_at',
     ];
-
+    protected $casts = [
+    'joined_at' => 'datetime:Y-m-d\TH:i:s',
+];
     public function club()
     {
         return $this->belongsTo(Club::class);

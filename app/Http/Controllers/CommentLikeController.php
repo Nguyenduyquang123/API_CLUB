@@ -25,10 +25,11 @@ class CommentLikeController extends Controller
         return response()->json(['error' => 'Thiếu comment_id hoặc user_id'], 400);
     }
 
-    $comment = PostComment::with('user')->find($commentId);
-    if (!$comment) {
-        return response()->json(['error' => 'Comment không tồn tại'], 404);
-    }
+   $comment = PostComment::with(['user', 'post'])->find($commentId);
+if (!$comment) {
+    return response()->json(['error' => 'Comment không tồn tại'], 404);
+}
+$clubId = $comment->post->club_id ?? null;
 
     $existing = CommentLike::where('comment_id', $commentId)
         ->where('user_id', $userId)
@@ -38,6 +39,16 @@ class CommentLikeController extends Controller
         // Unlike
         $existing->delete();
         $liked = false;
+         $oldNoti = Notification::where('from_user_id', $userId)
+                ->where('user_id', $comment->user_id)
+                ->where('type', 'comment_like')
+                ->where('related_comment_id', $commentId)
+                ->first();
+
+    if ($oldNoti) {
+        $oldNoti->delete();
+    }
+
     } else {
         // Like
         CommentLike::create([
@@ -53,6 +64,7 @@ class CommentLikeController extends Controller
             'user_id' => $comment->user_id,     
             'from_user_id' => $userId,             
             'type' => 'comment_like',
+            'club_id' => $clubId,
             'title' => 'Bình luận được thích',
             'message' => 'đã thích bình luận của bạn',
             'related_post_id' => $comment->post_id,
