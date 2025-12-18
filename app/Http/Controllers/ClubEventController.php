@@ -10,6 +10,10 @@ use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ClubEventController extends Controller
 {
@@ -113,9 +117,10 @@ class ClubEventController extends Controller
         foreach ($members as $member) {
             $noti = Notification::create([
                 'user_id' => $member->user_id,
+                'from_user_id' => $event->id,
                 'type' => 'club_event',
                 'club_id' => $event->club_id,       // thêm dòng này
-                'title' => 'Sự kiện sắp tới: ' . $event->title,
+                'title' => $event->title,
                 'message' => $event->description,
                 'related_post_id' => null,
                 'related_comment_id' => null,
@@ -364,5 +369,50 @@ class ClubEventController extends Controller
             return response()->json(['joined' => true]);
         }
     }
+
+
+public function exportParticipants($eventId)
+{
+    $participants = DB::table('event_participants')
+        ->join('users', 'event_participants.user_id', '=', 'users.id')
+        ->where('event_participants.event_id', $eventId)
+        ->select(
+            'users.displayName',
+            'users.email',
+            'event_participants.role'
+        )
+        ->get();
+
+    $filename = "participants_event_{$eventId}.csv";
+
+    $response = new StreamedResponse(function () use ($participants) {
+        $file = fopen('php://output', 'w');
+
+        // Giúp Excel đọc UTF-8
+        fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+        // Header cột
+        fputcsv($file, ["Họ Tên", "Email", "Vai Trò"]);
+
+        // Ghi từng dòng
+        foreach ($participants as $p) {
+            fputcsv($file, [
+                $p->displayName,
+                $p->email,
+                $p->role
+            ]);
+        }
+
+        fclose($file);
+    });
+
+    $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+    $response->headers->set(
+        'Content-Disposition',
+        'attachment; filename="'.$filename.'"'
+    );
+
+    return $response;
+}
 
 }

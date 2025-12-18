@@ -200,5 +200,39 @@ public function destroy(Request $request, $id)
 
         return $validator->validated();
     }
+
+     public function pin($postId, Request $request)
+    {
+        $post = Post::find($postId);
+        if (!$post) {
+            return response()->json(['error' => 'Post not found'], 404);
+        }
+
+        $post->is_pinned = 1; 
+        $post->save();
+
+        return response()->json(['message' => 'Đã ghim bài']);
+    }
+
+     public function unpin($id)
+    {
+  
+        $post = Post::find($id);
+
+        if (!$post) {
+            return response()->json([
+                'error' => 'Bài viết không tồn tại'
+            ], 404);
+        }
+
+  
+        $post->is_pinned = 0;
+        $post->save();
+
+        return response()->json([
+            'message' => 'Bỏ ghim bài viết thành công',
+            'post' => $post
+        ]);
+    }
    
 }

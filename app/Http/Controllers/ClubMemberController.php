@@ -10,9 +10,14 @@ class ClubMemberController extends Controller
 {
     public function index($clubId)
     {
-         $members = ClubMember::where('club_id', $clubId)->with('user')->get();
+        $members = ClubMember::where('club_id', $clubId)
+            ->with('user')
+            ->orderByRaw("FIELD(role, 'owner', 'admin', 'member')")
+            ->get();
+
         return response()->json($members);
     }
+
 
     public function store(Request $request, $clubId)
     {
@@ -167,6 +172,15 @@ class ClubMemberController extends Controller
 
         return response()->json(['message' => 'Bạn đã rời CLB thành công']);
     }
+    public function countMembers($clubId)
+{
+    $count = ClubMember::where('club_id', $clubId)->count();
+
+    return response()->json([
+        "club_id" => $clubId,
+        "members_count" => $count
+    ]);
+}
 
 
 

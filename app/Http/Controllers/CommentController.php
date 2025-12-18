@@ -6,6 +6,7 @@ use App\Models\PostComment;
 use Illuminate\Http\Request;
 use App\Events\CommentCreated;
 use App\Events\NewNotification;
+use App\Models\ClubMember;
 use App\Models\Notification;
 use App\Models\Post;
 use App\Models\User;
@@ -53,7 +54,7 @@ class CommentController extends Controller
             'type' => 'comment',
             'club_id' => $post->club_id,                // nếu post thuộc club
             'title' => 'Có bình luận mới',
-            'message' =>'đã bình luận bài đăng của bạn',
+            'message' => 'đã bình luận bài đăng: "' . $post->title . '"',
             'related_post_id' => $post->id,
             'related_comment_id' => $comment->id,
             'is_read' => false
@@ -68,6 +69,61 @@ class CommentController extends Controller
 
     return response()->json($comment->load('user'), 201);
 }
+
+public function delete($id, Request $request)
+{
+    $userId = $request->user_id;
+
+    // Lấy comment + post
+    $comment = PostComment::with('post')->find($id);
+    if (!$comment) {
+        return response()->json(['message' => 'Không tìm thấy bình luận'], 404);
+    }
+
+    // Lấy user
+    $user = User::find($userId);
+    if (!$user) {
+        return response()->json(['message' => 'User không tồn tại'], 404);
+    }
+
+    // Lấy club_id từ bài post
+    $clubId = $comment->post->club_id ?? null;
+
+    if (!$clubId) {
+        return response()->json(['message' => 'Không xác định được club'], 400);
+    }
+
+    // ⭐ LẤY ROLE TRONG CLUB
+    $member = ClubMember::where('club_id', $clubId)
+                        ->where('user_id', $userId)
+                        ->first();
+
+    $clubRole = $member->role ?? null; // owner, admin, member,...
+
+    // Kiểm tra quyền
+    $isCommentOwner = $comment->user_id == $userId;
+    $isPostOwner = $comment->post->creator_id == $userId;
+
+    // Cho phép nếu:
+    // - chính người viết comment
+    // - hoặc là owner của club
+    // - hoặc là admin của club
+    if (
+        !$isCommentOwner &&
+        !in_array($clubRole, ['owner', 'admin']) &&
+        !$isPostOwner
+    ) {
+        return response()->json(['message' => 'Bạn không có quyền xoá bình luận'], 403);
+    }
+
+    // Xóa comment
+    $comment->delete();
+
+    return response()->json(['message' => 'Đã xoá bình luận']);
+}
+
+
+
 
 }
 

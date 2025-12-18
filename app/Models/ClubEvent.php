@@ -38,12 +38,13 @@ class ClubEvent extends Model
                     ->withTimestamps();
     }
 
-        public function participants()
+    public function participants()
     {
-        return $this->belongsToMany(User::class, 'event_participants')
-                    ->withPivot('role')
+        return $this->belongsToMany(User::class, 'event_participants', 'event_id', 'user_id')
+                    ->withPivot(['status', 'role'])
                     ->withTimestamps();
     }
+
     public function joinedEvents()
     {
         return $this->belongsToMany(ClubEvent::class, 'event_participants')

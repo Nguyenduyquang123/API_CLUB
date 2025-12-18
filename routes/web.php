@@ -59,20 +59,30 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/users/{userId}/stats', 'UserController@getUserStats');
     $router->get('/users/{userId}/posts', 'UserController@getUserPosts');
     $router->get('/users/{userId}/notifications', 'UserController@getUserNotifications');
+    $router->get('/users/{userId}/joined-events', 'UserController@getJoinedEvents');
+    
+    
+    $router->post('/notifications/read/{id}', ['uses' => 'UserController@markAsRead']);
+    $router->delete('/notifications/{id}', ['uses' => 'UserController@destroyNotification']);
+
+    $router->get('/notifications/read-count/{userId}', 'UserController@readCount');
 
     $router->get('clubs', 'ClubController@index');
     $router->group(['middleware' => 'auth'], function () use ($router) {
         $router->get('/clubs/{id}', 'ClubController@show');
+        $router->get('/clubs/{id}/settings', 'ClubController@showSettings');
     });
     $router->post('clubs', 'ClubController@store');
     $router->put('clubs/{id}', 'ClubController@update');
+    $router->post('/clubs/{clubId}/update', 'ClubController@update');
    // $router->delete('clubs/{id}', 'ClubController@destroy');
     $router->get('/my-clubs', ['middleware' => 'auth', 'uses' => 'ClubController@myClubs']);
     $router->post('/clubs/join', 'ClubController@joinByCode');
     $router->post('/club/{club}/invite', 'ClubController@sendInvite');
     $router->post('/club/accept-invite', 'ClubController@acceptInvite');
     $router->delete('/clubs/{clubId}', 'ClubController@deleteClub');
-
+ 
+    
 
     // Category routes
     $router->get('categories', 'CategoryController@index');
@@ -109,6 +119,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/clubs/{clubId}/member', 'ClubMemberController@index');
     // Thêm thành viên mới
     $router->post('/clubs/{clubId}/members', 'ClubMemberController@store');
+    
     // Xóa thành viên
     $router->delete('/members/{id}', 'ClubMemberController@destroy');
     // ✏️ Sửa vai trò thành viên (member -> admin, v.v)
@@ -116,17 +127,13 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/members/{id}','ClubMemberController@show');
    
    $router->get('/clubs/{clubId}/my-role', 'ClubMemberController@getMyRole'); // $router->get('/test-mail', function () {
-    //     Mail::raw('Đây là email test', function ($message) {
-    //         $message->to('example@gmail.com')->subject('Test mail');
-    //     });
-    
-    //     return '<h2>✅ Email đã được gửi thành công!</h2>';
-    // });
+   $router->get('/clubs/{clubId}/members/count','ClubMemberController@countMembers') ;
+   
     $router->post('/clubs/{clubId}/toggle-join', 'ClubMemberController@toggleJoin');
     $router->get('/clubs/{clubId}/members', 'ClubMemberController@listMembers');
     $router->delete('/clubs/{clubId}/members/{memberId}', 'ClubMemberController@removeMember');
     $router->post('/clubs/{clubId}/leave', 'ClubMemberController@leaveClub');
-
+   
 
 
     $router->group(['prefix' => '/clubs', 'middleware' => 'auth'], function () use ($router) {
@@ -140,20 +147,71 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
         // Hủy lời mời
         $router->delete('/invites/{inviteId}/cancel', 'ClubInviteController@cancelInvite');
-
+        
     });
+    $router->get('/clubs/invites/{inviteId}', 'ClubInviteController@show');
     
     $router->get('/posts/{postId}/likes', 'PostLikeController@index');
     $router->post('/posts/toggle-like', 'PostLikeController@toggleLike');
     $router->post('/posts/check-like', 'PostLikeController@checkLike');
-
-     $router->get('/comments/{commentId}/likes', 'CommentLikeController@index');
+    $router->patch('/posts/{postId}/pin', 'PostController@pin');
+    $router->patch('/posts/{id}/unpin', 'PostController@unpin');
+ 
+    $router->get('/comments/{commentId}/likes', 'CommentLikeController@index');
     $router->post('/comments/toggle-like', 'CommentLikeController@toggleLike');
     $router->post('/comments/check-like', 'CommentLikeController@checkLike');
+    $router->delete('/comments/{id}', 'CommentController@delete');
+
+
+    $router->get('/events/{eventId}/export-participants', 'ClubEventController@exportParticipants');
+
+
+    // User Calendar Event routes
+    $router->post('/calendar/add', 'UserCalendarEventController@store');
+    $router->get('/calendar/{userId}', 'UserCalendarEventController@index');
+    $router->get('/notifications/event-reminder', 'NotificationController@eventReminder');
+    $router->get('/calendar/today/{userId}', 'UserCalendarEventController@getTodayEvents');
+    $router->delete('/calendar/{userId}/{eventId}', 'UserCalendarEventController@remove');
+
+
     
-    
+$router->group(['prefix' => 'clubs'], function () use ($router) {
+
+    // 1. User gửi đơn xin gia nhập
+    $router->post('{clubId}/join-request', 'ClubJoinRequestController@requestJoin');
+
+    // 2. Admin xem danh sách đơn của 1 CLB
+    $router->get('{clubId}/join-requests', 'ClubJoinRequestController@listRequests');
+    $router->post('/{clubId}/join-requests/{id}/approve', 'ClubJoinRequestController@approve');
+    $router->post('/{clubId}/join-requests/{id}/reject', 'ClubJoinRequestController@reject');
+
+});   
+
+$router->group(['prefix' => 'events/{eventId}'], function () use ($router) {
+
+    // Lấy danh sách người tham gia
+    $router->get('/participantss', 'EventParticipantController@index');
+
+    // Xác nhận
+    $router->post('/participants/{userId}/confirm', 'EventParticipantController@confirm');
+
+    // Hủy / từ chối
+    $router->post('/participants/{userId}/cancel', 'EventParticipantController@cancel');
 });
 
+$router->get('/clubs/{clubId}/statistics', 'StatisticController@getStats');
+$router->post('/clubs/{clubId}/statistics/generate', 'StatisticController@generateStats');
 
+
+
+
+$router->post('clubs/{id}/update-privacy', 'ClubController@updatePrivacy');
+
+
+
+});
+
+ $router->get('/clubs/public','ClubController@publicClubs');
+    
 
 

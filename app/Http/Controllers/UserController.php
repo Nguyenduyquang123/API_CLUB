@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EventParticipant;
 use App\Models\Notification;
 use App\Models\Post;
 use Carbon\Carbon;
@@ -199,13 +200,79 @@ class UserController extends Controller
         return response()->json($posts);
     }
     public function getUserNotifications($userId)
-{
-   $notifications = Notification::with(['fromUser', 'club'])
-    ->where('user_id', $userId)
-    ->orderBy('created_at', 'desc')
-    ->get();
+    {
+    $notifications = Notification::with(['fromUser', 'club'])
+        ->where('user_id', $userId)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
     return response()->json($notifications);
+    }
+    public function markAsRead($id)
+    {
+        $noti = Notification::find($id);
+
+        if (!$noti) {
+            return response()->json(['message' => 'Not found'], 404);
+        }
+
+        $noti->is_read = 1;
+        $noti->save();
+
+        return response()->json(['message' => 'Updated']);
+    }
+    public function destroyNotification($id)
+{
+    $noti = Notification::find($id);
+
+    if (!$noti) {
+        return response()->json(['message' => 'Not found'], 404);
+    }
+
+    $noti->delete();
+
+    return response()->json(['message' => 'Deleted']);
 }
+public function readCount($userId)
+{
+    $count = Notification::where('user_id', $userId)
+        ->where('is_read', 0)
+        ->select('type', 'related_post_id', 'from_user_id')
+        ->groupBy('type', 'related_post_id', 'from_user_id')
+        ->get()
+        ->count();
 
+    return response()->json([
+        'read_count' => $count
+    ]);
+}
+public function getJoinedEvents($userId, Request $request)
+{
+    $clubId = $request->query('club_id'); // Lấy club_id từ query param
 
+    if (!$clubId) {
+        return response()->json([
+            'error' => 'club_id is required'
+        ], 400);
+    }
+
+    // Lấy danh sách event mà user tham gia trong câu lạc bộ
+    $joinedEvents = EventParticipant::with('event')
+        ->where('user_id', $userId)
+        ->whereHas('event', function ($query) use ($clubId) {
+            $query->where('club_id', $clubId);
+        })
+        ->get()
+        ->map(function ($ep) {
+            return $ep->event; // chỉ trả về dữ liệu event
+        });
+
+    return response()->json([
+        'user_id' => $userId,
+        'club_id' => $clubId,
+        'events' => $joinedEvents
+    ]);
+
+    
+}
 }

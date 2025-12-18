@@ -40,6 +40,16 @@ public function toggleLike(Request $request)
         // Nếu đã like → bỏ like
         $existing->delete();
         $liked = false;
+ 
+    $oldNoti = Notification::where('from_user_id', $userId)
+                ->where('user_id', $post->user_id)
+                ->where('type', 'like')
+                ->where('related_post_id', $postId)
+                ->first();
+
+    if ($oldNoti) {
+        $oldNoti->delete();
+    }
 
     } else {
         // Nếu chưa like → thêm like
@@ -57,7 +67,8 @@ public function toggleLike(Request $request)
                 'user_id'          => $post->user_id,  // người nhận thông báo
                 'from_user_id'     => $userId,         // người tạo thông báo
                 'type'             => 'like',
-                'title'            => 'đã thích bài viết của bạn.',
+                'club_id'          => $post->club_id,  // nếu post thuộc club
+                'title'            => 'đã thích bài đăng: "' . $post->title . '"',
                 'related_post_id'  => $postId,
                 'is_read'          => 0,
             ]);

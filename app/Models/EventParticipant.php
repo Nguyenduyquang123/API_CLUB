@@ -12,6 +12,7 @@ class EventParticipant extends Model
         'event_id',
         'user_id',
         'role',
+        'status'
     ];
 
     // 🔹 Mối quan hệ đến sự kiện
