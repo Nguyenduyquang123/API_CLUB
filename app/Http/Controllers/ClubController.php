@@ -306,7 +306,7 @@ class ClubController extends Controller
     }
     public function publicClubs()
     {
-        $clubs = Club::where('is_public', 1)->get();
+        $clubs = Club::where('is_public', 1)->inRandomOrder()->get();
         return response()->json($clubs);
     }
     public function updatePrivacy($id, Request $request)
@@ -324,6 +324,19 @@ class ClubController extends Controller
             'privacy' => $club->is_public
         ]);
     }
+    public function publicShow($id)
+    {
+        $club = Club::where('is_public', 1)->find($id);
+
+        if (!$club) {
+            return response()->json([
+                'message' => 'CLB không tồn tại hoặc không công khai'
+            ], 404);
+        }
+
+        return response()->json($club);
+    }
+
 
 
 }

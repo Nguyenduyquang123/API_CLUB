@@ -111,57 +111,56 @@ class PostController extends Controller
     }
 
 
-public function destroy(Request $request, $id)
-{
-    $post = Post::find($id);
+    public function destroy(Request $request, $id)
+    {
+        $post = Post::find($id);
 
-    if (!$post) {
-        return response()->json(['message' => 'Post not found'], 404);
+        if (!$post) {
+            return response()->json(['message' => 'Post not found'], 404);
+        }
+
+        $authUserId = $request->input('auth_user_id');
+        if (!$authUserId) {
+            return response()->json(['message' => 'Missing auth_user_id'], 400);
+        }
+
+        $clubMember = ClubMember::where('club_id', $post->club_id)
+            ->where('user_id', $authUserId)
+            ->first();
+
+        if (!$clubMember) {
+            return response()->json(['message' => 'User is not a member of this club'], 403);
+        }
+
+        $userRoleInClub = $clubMember->role;
+
+        $postCreatorMember = ClubMember::where('club_id', $post->club_id)
+            ->where('user_id', $post->user_id)
+            ->first();
+
+        $postCreatorRole = $postCreatorMember?->role;
+
+        // Người tạo bài
+        if ($authUserId == $post->user_id) {
+            $post->delete();
+            return response()->json(['message' => 'Post deleted (author)']);
+        }
+
+        // Owner
+        if ($userRoleInClub === 'owner') {
+            $post->delete();
+            return response()->json(['message' => 'Post deleted (owner)']);
+        }
+
+        // Admin (không xoá bài của owner)
+        if ($userRoleInClub === 'admin' && $postCreatorRole !== 'owner') {
+            $post->delete();
+            return response()->json(['message' => 'Post deleted (admin)']);
+        }
+
+        return response()->json(['message' => 'Bạn không có quyền xóa bài này'], 403);
     }
 
-    $authUserId = $request->input('auth_user_id');
-
-    if (!$authUserId) {
-        return response()->json(['message' => 'Missing auth_user_id'], 400);
-    }
-
-  
-    $clubMember = ClubMember::where('club_id', $post->club_id)
-                            ->where('user_id', $authUserId)
-                            ->first();
-
-    if (!$clubMember) {
-        return response()->json(['message' => 'User is not a member of this club'], 403);
-    }
-
-    $userRoleInClub = $clubMember->role;
-
-   
-    $postCreatorMember = ClubMember::where('club_id', $post->club_id)
-                                    ->where('user_id', $post->user_id)
-                                    ->first();
-    $postCreatorRole = $postCreatorMember ? $postCreatorMember->role : null;
-
-   
-    if ($authUserId == $post->user_id) {
-        $post->delete();
-        return response()->json(['message' => 'Post deleted successfully (owner of post)']);
-    }
-
-   
-    if ($userRoleInClub === 'owner') {
-        $post->delete();
-        return response()->json(['message' => 'Post deleted successfully (owner)']);
-    }
-
-  
-    if ($userRoleInClub === 'admin' && $postCreatorRole === 'member') {
-        $post->delete();
-        return response()->json(['message' => 'Post deleted successfully (admin)']);
-    }
-
-    return response()->json(['message' => 'Bạn không có quyền xóa bài này'], 403);
-}
 
 
     public function getByClub($club_id)

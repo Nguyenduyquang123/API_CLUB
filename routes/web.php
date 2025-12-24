@@ -207,7 +207,8 @@ $router->post('/clubs/{clubId}/statistics/generate', 'StatisticController@genera
 
 $router->post('clubs/{id}/update-privacy', 'ClubController@updatePrivacy');
 
-
+// Public club routes
+$router->get('/public/clubs/{id}', 'ClubController@publicShow');
 
 });
 

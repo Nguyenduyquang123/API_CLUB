@@ -60,7 +60,7 @@ class ClubEventController extends Controller
             'created_by' => 'required|exists:users,id',
             'title' => 'required|string|max:255',
             'banner' => 'nullable|file|image',
-            'description' => 'required|string|max:255',
+            'description' => 'required|string',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after_or_equal:start_time',
             'location' => 'nullable|string|max:255',

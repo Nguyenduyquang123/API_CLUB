@@ -39,6 +39,7 @@ class ClubMemberController extends Controller
     }
     public function updateRole(Request $request, $id)
     {
+        
         $member = ClubMember::find($id);
 
         if (!$member) {
@@ -50,7 +51,7 @@ class ClubMemberController extends Controller
 
         // Validate dữ liệu
         $validator = Validator::make($request->all(), [
-            'role' => 'required|string|in:owner,admin,member' // thêm các role khác nếu cần
+           'role' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
